@@ -1,16 +1,22 @@
 
 import React, { useState } from 'react';
-import LoginScreen from '@/components/LoginScreen';
 import Dashboard from '@/components/Dashboard';
+import UsernameEntry from '@/components/UsernameEntry';
 
 const Index = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
+  const [hasEnteredUsername, setHasEnteredUsername] = useState(false);
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
+  const handleUsernameSubmit = (enteredUsername: string) => {
+    setUsername(enteredUsername);
+    setHasEnteredUsername(true);
   };
 
-  return isLoggedIn ? <Dashboard /> : <LoginScreen onLogin={handleLogin} />;
+  return hasEnteredUsername ? (
+    <Dashboard username={username} />
+  ) : (
+    <UsernameEntry onUsernameSubmit={handleUsernameSubmit} />
+  );
 };
 
 export default Index;

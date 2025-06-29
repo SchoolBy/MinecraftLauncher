@@ -1,26 +1,76 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Settings, Play } from 'lucide-react';
+import { Settings, Play, Upload } from 'lucide-react';
 import SettingsPanel from './SettingsPanel';
-import NewsPanel from './NewsPanel';
-import ModsMenu from './ModsMenu';
+import DownloadsPanel from './DownloadsPanel';
+import ServersList from './ServersList';
 import LoadingScreen from './LoadingScreen';
 
-const Dashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'home' | 'news' | 'mods'>('home');
+interface DashboardProps {
+  username: string;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ username }) => {
+  const [activeTab, setActiveTab] = useState<'home' | 'downloads' | 'servers'>('home');
   const [showSettings, setShowSettings] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState('1.20.4');
+  const [playtime, setPlaytime] = useState(0);
+  const [profileImage, setProfileImage] = useState<string>('');
+
+  // Track playtime
+  useEffect(() => {
+    const startTime = Date.now();
+    const savedPlaytime = localStorage.getItem(`playtime_${username}`) || '0';
+    setPlaytime(parseInt(savedPlaytime));
+
+    const interval = setInterval(() => {
+      const currentTime = Date.now();
+      const sessionTime = Math.floor((currentTime - startTime) / 1000);
+      const totalTime = parseInt(savedPlaytime) + sessionTime;
+      setPlaytime(totalTime);
+      localStorage.setItem(`playtime_${username}`, totalTime.toString());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [username]);
+
+  // Load profile image from cache
+  useEffect(() => {
+    const cachedImage = localStorage.getItem(`profile_${username}`);
+    if (cachedImage) {
+      setProfileImage(cachedImage);
+    }
+  }, [username]);
 
   const handleLaunch = () => {
     setIsLaunching(true);
     setTimeout(() => {
       setIsLaunching(false);
     }, 3000);
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setProfileImage(imageUrl);
+        localStorage.setItem(`profile_${username}`, imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const formatPlaytime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
   };
 
   if (isLaunching) {
@@ -39,8 +89,8 @@ const Dashboard: React.FC = () => {
             <nav className="flex space-x-1">
               {[
                 { id: 'home', label: 'Home' },
-                { id: 'news', label: 'News' },
-                { id: 'mods', label: 'Mods' }
+                { id: 'downloads', label: 'Downloads' },
+                { id: 'servers', label: 'Servers' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -59,8 +109,11 @@ const Dashboard: React.FC = () => {
 
           <div className="flex items-center space-x-4">
             <Avatar className="w-10 h-10 border-2 border-primary/30">
-              <AvatarImage src="https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=100&h=100&fit=crop&crop=face" />
-              <AvatarFallback>ST</AvatarFallback>
+              {profileImage ? (
+                <AvatarImage src={profileImage} />
+              ) : (
+                <AvatarFallback>{username.charAt(0).toUpperCase()}</AvatarFallback>
+              )}
             </Avatar>
             <Button
               variant="ghost"
@@ -82,22 +135,37 @@ const Dashboard: React.FC = () => {
               {/* Player Info */}
               <Card className="lg:col-span-1 p-6 glass-effect neumorphic">
                 <div className="text-center space-y-4">
-                  <Avatar className="w-24 h-24 mx-auto border-4 border-primary/30">
-                    <AvatarImage src="https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=200&h=200&fit=crop&crop=face" />
-                    <AvatarFallback>ST</AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar className="w-24 h-24 mx-auto border-4 border-primary/30">
+                      {profileImage ? (
+                        <AvatarImage src={profileImage} />
+                      ) : (
+                        <AvatarFallback className="text-2xl">{username.charAt(0).toUpperCase()}</AvatarFallback>
+                      )}
+                    </Avatar>
+                    <label className="absolute bottom-0 right-1/2 translate-x-1/2 translate-y-2 cursor-pointer">
+                      <Button size="sm" variant="secondary" className="rounded-full p-2">
+                        <Upload className="w-4 h-4" />
+                      </Button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                   <div>
-                    <h3 className="text-xl font-semibold">Steve_Miner</h3>
-                    <p className="text-muted-foreground">Premium Player</p>
+                    <h3 className="text-xl font-semibold">{username}</h3>
                   </div>
                   <div className="space-y-2 pt-4">
                     <div className="flex justify-between text-sm">
                       <span>Playtime</span>
-                      <span className="text-primary">127h 42m</span>
+                      <span className="text-primary">{formatPlaytime(playtime)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span>Last Played</span>
-                      <span className="text-muted-foreground">2 hours ago</span>
+                      <span>Status</span>
+                      <span className="text-green-500">Online</span>
                     </div>
                   </div>
                 </div>
@@ -135,27 +203,11 @@ const Dashboard: React.FC = () => {
                 </div>
               </Card>
             </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              {[
-                { label: 'Servers Online', value: '1,247', color: 'text-green-500' },
-                { label: 'Players Active', value: '28,431', color: 'text-blue-500' },
-                { label: 'Mods Installed', value: '23', color: 'text-purple-500' }
-              ].map((stat, index) => (
-                <Card key={index} className="p-6 glass-effect neumorphic hover-lift">
-                  <div className="text-center">
-                    <div className={`text-3xl font-bold ${stat.color} mb-2`}>{stat.value}</div>
-                    <div className="text-muted-foreground">{stat.label}</div>
-                  </div>
-                </Card>
-              ))}
-            </div>
           </div>
         )}
 
-        {activeTab === 'news' && <NewsPanel />}
-        {activeTab === 'mods' && <ModsMenu />}
+        {activeTab === 'downloads' && <DownloadsPanel />}
+        {activeTab === 'servers' && <ServersList />}
       </main>
 
       {/* Settings Sidebar */}
