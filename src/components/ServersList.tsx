@@ -50,7 +50,7 @@ const ServersList: React.FC = () => {
   ];
 
   const handleConnectToServer = (ip: string) => {
-    setSelectedServer('servers.eaglercraft.com');
+    setSelectedServer(ip);
   };
 
   const handleCopyIP = (ip: string) => {
@@ -66,31 +66,6 @@ const ServersList: React.FC = () => {
       default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
-
-  // If a server is selected, show fullscreen iframe
-  if (selectedServer) {
-    return (
-      <div className="animate-fade-in h-[calc(100vh-120px)]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Connected to: {selectedServer}</h3>
-          <Button
-            variant="outline"
-            onClick={() => setSelectedServer('')}
-          >
-            Back to Server List
-          </Button>
-        </div>
-        <div className="h-full">
-          <iframe
-            src={`https://${selectedServer}`}
-            className="w-full h-full rounded-lg border border-border/50"
-            title="Minecraft Server"
-            allow="fullscreen"
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="animate-fade-in">
@@ -121,7 +96,7 @@ const ServersList: React.FC = () => {
       </Card>
 
       {/* Server List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {servers.map((server) => (
           <Card key={server.id} className="p-6 glass-effect neumorphic hover-lift group">
             <div className="space-y-4">
@@ -169,6 +144,29 @@ const ServersList: React.FC = () => {
           </Card>
         ))}
       </div>
+
+      {/* Server Connection Frame */}
+      {selectedServer && (
+        <Card className="p-4 glass-effect neumorphic">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Connected to: {selectedServer}</h3>
+            <Button
+              variant="outline"
+              onClick={() => setSelectedServer('')}
+            >
+              Disconnect
+            </Button>
+          </div>
+          <div className="relative">
+            <iframe
+              src={`https://servers.eaglercraft.com/?ip=${selectedServer}`}
+              className="w-full h-96 rounded-lg border border-border/50"
+              title="Minecraft Server"
+              allow="fullscreen"
+            />
+          </div>
+        </Card>
+      )}
     </div>
   );
 };

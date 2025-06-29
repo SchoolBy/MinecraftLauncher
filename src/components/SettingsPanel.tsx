@@ -48,48 +48,22 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
   const applySettings = () => {
     const root = document.documentElement;
     
-    // Apply theme colors and gradients
+    // Apply theme colors
     switch (settings.theme) {
       case 'blue':
         root.style.setProperty('--primary', '217 91% 60%');
-        // Update gradient backgrounds
-        document.querySelectorAll('.bg-gradient-to-r').forEach(el => {
-          if (el.classList.contains('from-primary')) {
-            (el as HTMLElement).style.background = 'linear-gradient(to right, hsl(217 91% 60%), hsl(220 91% 65%))';
-          }
-        });
         break;
       case 'green':
         root.style.setProperty('--primary', '142 76% 36%');
-        document.querySelectorAll('.bg-gradient-to-r').forEach(el => {
-          if (el.classList.contains('from-primary')) {
-            (el as HTMLElement).style.background = 'linear-gradient(to right, hsl(142 76% 36%), hsl(145 76% 40%))';
-          }
-        });
         break;
       case 'red':
         root.style.setProperty('--primary', '0 84% 60%');
-        document.querySelectorAll('.bg-gradient-to-r').forEach(el => {
-          if (el.classList.contains('from-primary')) {
-            (el as HTMLElement).style.background = 'linear-gradient(to right, hsl(0 84% 60%), hsl(5 84% 65%))';
-          }
-        });
         break;
       case 'orange':
         root.style.setProperty('--primary', '25 95% 53%');
-        document.querySelectorAll('.bg-gradient-to-r').forEach(el => {
-          if (el.classList.contains('from-primary')) {
-            (el as HTMLElement).style.background = 'linear-gradient(to right, hsl(25 95% 53%), hsl(30 95% 58%))';
-          }
-        });
         break;
       default: // purple
         root.style.setProperty('--primary', '258 90% 66%');
-        document.querySelectorAll('.bg-gradient-to-r').forEach(el => {
-          if (el.classList.contains('from-primary')) {
-            (el as HTMLElement).style.background = 'linear-gradient(to right, hsl(258 90% 66%), hsl(220 91% 65%))';
-          }
-        });
     }
 
     // Apply font size

@@ -6,71 +6,100 @@ const LoadingScreen: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [loadingText, setLoadingText] = useState('Initializing...');
 
-  useEffect(() => {
-    const loadingSteps = [
-      { progress: 20, text: 'Loading game files...' },
-      { progress: 40, text: 'Preparing world...' },
-      { progress: 60, text: 'Starting game engine...' },
-      { progress: 80, text: 'Almost ready...' },
-      { progress: 100, text: 'Launching Minecraft!' }
-    ];
+  const loadingSteps = [
+    { text: 'Initializing...', duration: 500 },
+    { text: 'Loading game assets...', duration: 800 },
+    { text: 'Preparing world...', duration: 600 },
+    { text: 'Starting Minecraft...', duration: 700 },
+    { text: 'Almost ready...', duration: 500 }
+  ];
 
+  useEffect(() => {
     let currentStep = 0;
-    const interval = setInterval(() => {
+    let currentProgress = 0;
+    
+    const updateProgress = () => {
       if (currentStep < loadingSteps.length) {
         const step = loadingSteps[currentStep];
-        setProgress(step.progress);
         setLoadingText(step.text);
-        currentStep++;
-      } else {
-        clearInterval(interval);
+        
+        const stepProgress = (currentStep + 1) * (100 / loadingSteps.length);
+        const increment = (stepProgress - currentProgress) / 20;
+        
+        const progressInterval = setInterval(() => {
+          currentProgress += increment;
+          setProgress(Math.min(currentProgress, stepProgress));
+          
+          if (currentProgress >= stepProgress) {
+            clearInterval(progressInterval);
+            currentStep++;
+            
+            setTimeout(() => {
+              if (currentStep < loadingSteps.length) {
+                updateProgress();
+              }
+            }, 200);
+          }
+        }, step.duration / 20);
       }
-    }, 400);
+    };
 
-    return () => clearInterval(interval);
+    updateProgress();
   }, []);
 
   return (
-    <div className="min-h-screen bg-background particle-bg flex items-center justify-center">
-      {/* Smooth animated particles */}
-      <div className="fixed inset-0 pointer-events-none">
+    <div className="min-h-screen bg-background particle-bg flex items-center justify-center relative overflow-hidden">
+      {/* Animated background particles */}
+      <div className="absolute inset-0">
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-primary/40 rounded-full animate-particle-float"
             style={{
-              left: `${5 + (i * 4.5) % 90}%`,
-              top: `${5 + (i * 7) % 90}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${15 + (i % 8) * 2}s`
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 20}s`,
+              animationDuration: `${10 + Math.random() * 15}s`
             }}
           />
         ))}
       </div>
 
-      <div className="text-center space-y-8 z-10">
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-blue-500 to-purple-500 bg-clip-text text-transparent animate-pulse">
+      <div className="text-center space-y-8 max-w-md mx-auto animate-fade-in">
+        {/* Logo */}
+        <div className="animate-float">
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-blue-500 to-purple-500 bg-clip-text text-transparent mb-4">
             MineLauncher
           </h1>
-          <p className="text-muted-foreground text-lg">{loadingText}</p>
+          <div className="w-16 h-16 mx-auto bg-gradient-to-r from-primary to-blue-500 rounded-lg animate-pulse-glow" />
         </div>
 
-        <div className="w-80 space-y-2">
-          <Progress 
-            value={progress} 
-            className="h-3 bg-muted/30"
-          />
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Loading...</span>
-            <span>{progress}%</span>
+        {/* Loading Progress */}
+        <div className="space-y-4">
+          <div className="text-xl font-medium text-foreground">
+            {loadingText}
+          </div>
+          
+          <div className="space-y-2">
+            <Progress 
+              value={progress} 
+              className="w-full h-3 bg-muted/30"
+            />
+            <div className="text-sm text-muted-foreground">
+              {Math.round(progress)}%
+            </div>
           </div>
         </div>
 
+        {/* Loading Animation */}
         <div className="flex justify-center space-x-2">
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="w-3 h-3 bg-primary rounded-full animate-bounce"
+              style={{ animationDelay: `${i * 0.1}s` }}
+            />
+          ))}
         </div>
       </div>
     </div>
