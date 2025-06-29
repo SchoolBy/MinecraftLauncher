@@ -54,10 +54,10 @@ const Dashboard: React.FC<DashboardProps> = ({ username }) => {
 
   const launchMinecraft = (version: string) => {
     const versionUrlMap: Record<string, string> = {
-      '1.20.4': '/games/1.20.4/index.html',
-      '1.20.2': '/games/1.20.2/index.html',
-      '1.19.4': '/games/1.19.4/index.html',
-      '1.18.2': '/games/1.18.2/index.html',
+      '1.12.2': '/games/1.12.2/index.html',
+      '1.8.8': '/games/1.8.8/index.html',
+      '1.5.2': '/games/1.5.2/index.html',
+      'tuff': '/games/tuff/index.html',
     };
 
     const url = versionUrlMap[version];
@@ -199,10 +199,10 @@ const Dashboard: React.FC<DashboardProps> = ({ username }) => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-popover border-border/50">
-                        <SelectItem value="1.20.4">Minecraft 1.20.4</SelectItem>
-                        <SelectItem value="1.20.2">Minecraft 1.20.2</SelectItem>
-                        <SelectItem value="1.19.4">Minecraft 1.19.4</SelectItem>
-                        <SelectItem value="1.18.2">Minecraft 1.18.2</SelectItem>
+                        <SelectItem value="1.20.4">Minecraft 1.12.2</SelectItem>
+                        <SelectItem value="1.20.2">Minecraft 1.8.8</SelectItem>
+                        <SelectItem value="1.19.4">Minecraft 1.5.2</SelectItem>
+                        <SelectItem value="1.18.2">Minecraft tuff</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
