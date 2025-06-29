@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -127,13 +126,20 @@ export default {
 				},
 				'particle-float': {
 					'0%, 100%': {
-						transform: 'translate(0, 0) rotate(0deg)'
+						transform: 'translate(0, 0) rotate(0deg)',
+						opacity: '0.3'
 					},
-					'33%': {
-						transform: 'translate(30px, -30px) rotate(120deg)'
+					'25%': {
+						transform: 'translate(15px, -15px) rotate(90deg)',
+						opacity: '0.7'
 					},
-					'66%': {
-						transform: 'translate(-20px, 20px) rotate(240deg)'
+					'50%': {
+						transform: 'translate(-10px, -25px) rotate(180deg)',
+						opacity: '1'
+					},
+					'75%': {
+						transform: 'translate(-20px, 10px) rotate(270deg)',
+						opacity: '0.5'
 					}
 				}
 			},
@@ -144,7 +150,7 @@ export default {
 				'slide-in-right': 'slide-in-right 0.4s ease-out',
 				'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
 				'float': 'float 6s ease-in-out infinite',
-				'particle-float': 'particle-float 20s linear infinite'
+				'particle-float': 'particle-float 20s ease-in-out infinite'
 			}
 		}
 	},
