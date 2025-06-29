@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -22,7 +21,6 @@ const Dashboard: React.FC<DashboardProps> = ({ username }) => {
   const [playtime, setPlaytime] = useState(0);
   const [profileImage, setProfileImage] = useState<string>('');
 
-  // Track playtime
   useEffect(() => {
     const startTime = Date.now();
     const savedPlaytime = localStorage.getItem(`playtime_${username}`) || '0';
@@ -39,7 +37,6 @@ const Dashboard: React.FC<DashboardProps> = ({ username }) => {
     return () => clearInterval(interval);
   }, [username]);
 
-  // Load profile image from cache
   useEffect(() => {
     const cachedImage = localStorage.getItem(`profile_${username}`);
     if (cachedImage) {
@@ -51,143 +48,24 @@ const Dashboard: React.FC<DashboardProps> = ({ username }) => {
     setIsLaunching(true);
     setTimeout(() => {
       setIsLaunching(false);
-      // Launch the HTML file based on selected version
       launchMinecraft(selectedVersion);
     }, 3000);
   };
 
   const launchMinecraft = (version: string) => {
-    // Create and open HTML file based on version
-    const htmlContent = generateMinecraftHTML(version);
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    
-    // Open in new window/tab
-    const gameWindow = window.open(url, '_blank', 'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no,scrollbars=no');
-    
-    // Clean up URL after a delay
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 1000);
-  };
+    const versionUrlMap: Record<string, string> = {
+      '1.20.4': '/games/1.20.4/index.html',
+      '1.20.2': '/games/1.20.2/index.html',
+      '1.19.4': '/games/1.19.4/index.html',
+      '1.18.2': '/games/1.18.2/index.html',
+    };
 
-  const generateMinecraftHTML = (version: string) => {
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft ${version} - MineLauncher</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #1e1e2e, #2a2a3e);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .game-container {
-            text-align: center;
-            max-width: 800px;
-            padding: 2rem;
-        }
-        .version-title {
-            font-size: 3rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #4f46e5, #7c3aed);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
-        }
-        .game-frame {
-            width: 100%;
-            height: 500px;
-            border: 3px solid #4f46e5;
-            border-radius: 12px;
-            background: #1a1a2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #888;
-        }
-        .controls {
-            margin-top: 2rem;
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-        .control-btn {
-            background: linear-gradient(45deg, #4f46e5, #7c3aed);
-            border: none;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: transform 0.2s;
-        }
-        .control-btn:hover {
-            transform: scale(1.05);
-        }
-        .status {
-            margin-top: 1rem;
-            color: #10b981;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <div class="game-container">
-        <h1 class="version-title">Minecraft ${version}</h1>
-        <div class="game-frame" id="gameFrame">
-            <div>🎮 Minecraft ${version} is running!</div>
-        </div>
-        <div class="controls">
-            <button class="control-btn" onclick="toggleFullscreen()">Fullscreen</button>
-            <button class="control-btn" onclick="showSettings()">Settings</button>
-            <button class="control-btn" onclick="window.close()">Exit Game</button>
-        </div>
-        <div class="status">Status: Online | FPS: 60 | Ping: 25ms</div>
-    </div>
-
-    <script>
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else {
-                document.exitFullscreen();
-            }
-        }
-
-        function showSettings() {
-            alert('Game settings would open here!');
-        }
-
-        // Simulate game activity
-        setInterval(() => {
-            const fps = Math.floor(Math.random() * 20) + 50;
-            const ping = Math.floor(Math.random() * 30) + 15;
-            document.querySelector('.status').textContent = 
-                \`Status: Online | FPS: \${fps} | Ping: \${ping}ms\`;
-        }, 2000);
-
-        // Add some visual effects
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (confirm('Exit Minecraft ${version}?')) {
-                    window.close();
-                }
-            }
-        });
-    </script>
-</body>
-</html>`;
+    const url = versionUrlMap[version];
+    if (url) {
+      window.open(url, '_blank', 'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no,scrollbars=no');
+    } else {
+      alert(`Version ${version} is not available.`);
+    }
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -346,7 +224,6 @@ const Dashboard: React.FC<DashboardProps> = ({ username }) => {
         {activeTab === 'servers' && <ServersList />}
       </main>
 
-      {/* Settings Sidebar */}
       <SettingsPanel isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   );
